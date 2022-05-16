@@ -1,0 +1,1179 @@
+---
+swagger: "2.0"
+info:
+  version: "1.0.0"
+  title: "Metadata Store API."
+host: "localhost:8443"
+basePath: "/metastore/v1"
+schemes:
+- "http"
+- "https"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+paths:
+  /health:
+    get:
+      operationId: "HealthCheck"
+      parameters: []
+      responses:
+        "200":
+          description: ""
+        default:
+          description: "ErrorMessage"
+          schema:
+            $ref: "#/definitions/ErrorMessage"
+  /images:
+    get:
+      tags:
+      - "images"
+      summary: "Search image by id, name or digest ."
+      operationId: "GetImages"
+      parameters: []
+      responses:
+        "200":
+          description: "Image"
+          schema:
+            $ref: "#/definitions/Image"
+        default:
+          description: "ErrorMessage"
+          schema:
+            $ref: "#/definitions/ErrorMessage"
+    post:
+      tags:
+      - "images"
+      summary: "Create a new image report. Related packages and vulnerabilities are\
+        \ also created."
+      operationId: "CreateImageReport"
+      parameters:
+      - in: "body"
+        name: "Image"
+        required: true
+        schema:
+          $ref: "#/definitions/Image"
+        x-exportParamName: "Image"
+      responses:
+        "200":
+          description: "Image"
+          schema:
+            $ref: "#/definitions/Image"
+        default:
+          description: "ErrorMessage"
+          schema:
+            $ref: "#/definitions/ErrorMessage"
+  /images/{IDorDigest}/packages:
+    get:
+      tags:
+      - "packages"
+      summary: "List the packages in an image."
+      operationId: "GetImagePackages"
+      parameters:
+      - name: "IDorDigest"
+        in: "path"
+        required: true
+        type: "string"
+        x-exportParamName: "IDorDigest"
+      responses:
+        "200":
+          description: "Package"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Package"
+        default:
+          description: "ErrorMessage"
+          schema:
+            $ref: "#/definitions/ErrorMessage"
+  /images/{IDorDigest}/vulnerabilities:
+    get:
+      tags:
+      - "vulnerabilities"
+      summary: "List vulnerabilities from the given image."
+      operationId: "GetImageVulnerabilities"
+      parameters:
+      - name: "IDorDigest"
+        in: "path"
+        required: true
+        type: "string"
+        x-exportParamName: "IDorDigest"
+      - name: "Severity"
+        in: "query"
+        description: "Case insensitive vulnerabilities severity filter. Possible values\
+          \ are: low, medium, high, critical, unknown."
+        required: false
+        type: "string"
+        x-exportParamName: "Severity"
+        x-optionalDataType: "String"
+      responses:
+        "200":
+          description: "Vulnerability"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Vulnerability"
+        default:
+          description: "ErrorMessage"
+          schema:
+            $ref: "#/definitions/ErrorMessage"
+  /images/packages:
+    get:
+      tags:
+      - "packages"
+      summary: "List packages of the given image."
+      operationId: "GetImagePackagesQuery"
+      parameters:
+      - name: "id"
+        in: "query"
+        required: false
+        type: "integer"
+        format: "int64"
+        x-go-name: "ID"
+        x-exportParamName: "Id"
+        x-optionalDataType: "Int64"
+      - name: "digest"
+        in: "query"
+        required: false
+        type: "string"
+        x-go-name: "Digest"
+        x-exportParamName: "Digest"
+        x-optionalDataType: "String"
+      - name: "name"
+        in: "query"
+        required: false
+        type: "string"
+        x-go-name: "Name"
+        x-exportParamName: "Name"
+        x-optionalDataType: "String"
+      responses:
+        "200":
+          description: "Package"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Package"
+        default:
+          description: "ErrorMessage"
+          schema:
+            $ref: "#/definitions/ErrorMessage"
+  /packages:
+    get:
+      tags:
+      - "packages"
+      summary: "Search packages by id, name and/or version."
+      operationId: "GetPackages"
+      parameters:
+      - name: "id"
+        in: "query"
+        description: "Any of id or name must be provided"
+        required: false
+        type: "integer"
+        format: "int64"
+        x-go-name: "ID"
+        x-exportParamName: "Id"
+        x-optionalDataType: "Int64"
+      - name: "name"
+        in: "query"
+        description: "Any of id or name must be provided"
+        required: false
+        type: "string"
+        x-go-name: "Name"
+        x-exportParamName: "Name"
+        x-optionalDataType: "String"
+      - name: "version"
+        in: "query"
+        required: false
+        type: "string"
+        x-go-name: "Version"
+        x-exportParamName: "Version"
+        x-optionalDataType: "String"
+      responses:
+        "200":
+          description: "Package"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Package"
+        default:
+          description: "ErrorMessage"
+          schema:
+            $ref: "#/definitions/ErrorMessage"
+  /packages/{IDorName}/images:
+    get:
+      tags:
+      - "images"
+      summary: "List the images that contain the given package."
+      operationId: "GetPackageImages"
+      parameters:
+      - name: "IDorName"
+        in: "path"
+        required: true
+        type: "string"
+        x-exportParamName: "IDorName"
+      responses:
+        "200":
+          description: "Image"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Image"
+        default:
+          description: "ErrorMessage"
+          schema:
+            $ref: "#/definitions/ErrorMessage"
+  /packages/{IDorName}/sources:
+    get:
+      tags:
+      - "sources"
+      summary: "List the sources containing the given package."
+      operationId: "GetPackageSources"
+      parameters:
+      - name: "IDorName"
+        in: "path"
+        required: true
+        type: "string"
+        x-exportParamName: "IDorName"
+      responses:
+        "200":
+          description: "Source"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Source"
+        default:
+          description: "ErrorMessage"
+          schema:
+            $ref: "#/definitions/ErrorMessage"
+  /packages/{IDorName}/vulnerabilities:
+    get:
+      tags:
+      - "vulnerabilities"
+      summary: "List vulnerabilities from the given package."
+      operationId: "GetPackageVulnerabilities"
+      parameters:
+      - name: "IDorName"
+        in: "path"
+        required: true
+        type: "string"
+        x-exportParamName: "IDorName"
+      - name: "Severity"
+        in: "query"
+        description: "Case insensitive vulnerabilities severity filter. Possible values\
+          \ are: low, medium, high, critical, unknown."
+        required: false
+        type: "string"
+        x-exportParamName: "Severity"
+        x-optionalDataType: "String"
+      responses:
+        "200":
+          description: "Vulnerability"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Vulnerability"
+        default:
+          description: "ErrorMessage"
+          schema:
+            $ref: "#/definitions/ErrorMessage"
+  /sources:
+    get:
+      tags:
+      - "sources"
+      summary: "Search for sources by ID, repository, commit sha and/or organization."
+      operationId: "GetSources"
+      parameters:
+      - name: "id"
+        in: "query"
+        required: false
+        type: "integer"
+        format: "int64"
+        x-go-name: "ID"
+        x-exportParamName: "Id"
+        x-optionalDataType: "Int64"
+      - name: "repo"
+        in: "query"
+        required: false
+        type: "string"
+        x-go-name: "Repository"
+        x-exportParamName: "Repo"
+        x-optionalDataType: "String"
+      - name: "sha"
+        in: "query"
+        required: false
+        type: "string"
+        x-go-name: "Commit"
+        x-exportParamName: "Sha"
+        x-optionalDataType: "String"
+      - name: "org"
+        in: "query"
+        required: false
+        type: "string"
+        x-go-name: "Organization"
+        x-exportParamName: "Org"
+        x-optionalDataType: "String"
+      responses:
+        "200":
+          description: "Source"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Source"
+        default:
+          description: "ErrorMessage"
+          schema:
+            $ref: "#/definitions/ErrorMessage"
+    post:
+      tags:
+      - "sources"
+      summary: "Create a new source report. Related packages and vulnerabilities are\
+        \ also created."
+      operationId: "CreateSource"
+      parameters:
+      - in: "body"
+        name: "Image"
+        required: true
+        schema:
+          $ref: "#/definitions/Source"
+        x-exportParamName: "Image"
+      responses:
+        "200":
+          description: "Source"
+          schema:
+            $ref: "#/definitions/Source"
+        default:
+          description: "ErrorMessage"
+          schema:
+            $ref: "#/definitions/ErrorMessage"
+  /sources/packages:
+    get:
+      tags:
+      - "packages"
+      summary: "List packages of the given source."
+      operationId: "GetSourcePackagesQuery"
+      parameters:
+      - name: "id"
+        in: "query"
+        required: false
+        type: "integer"
+        format: "uint64"
+        x-go-name: "ID"
+        x-exportParamName: "Id"
+        x-optionalDataType: "Int32"
+      - name: "repo"
+        in: "query"
+        required: false
+        type: "string"
+        x-go-name: "Repository"
+        x-exportParamName: "Repo"
+        x-optionalDataType: "String"
+      - name: "sha"
+        in: "query"
+        required: false
+        type: "string"
+        x-go-name: "Sha"
+        x-exportParamName: "Sha"
+        x-optionalDataType: "String"
+      responses:
+        "200":
+          description: "Package"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Package"
+        default:
+          description: "ErrorMessage"
+          schema:
+            $ref: "#/definitions/ErrorMessage"
+  /sources/vulnerabilities:
+    get:
+      tags:
+      - "vulnerabilities"
+      summary: "List vulnerabilities of the given source."
+      operationId: "GetSourceVulnerabilitiesQuery"
+      parameters:
+      - name: "Severity"
+        in: "query"
+        description: "Case insensitive vulnerabilities severity filter. Possible values\
+          \ are: low, medium, high, critical, unknown."
+        required: false
+        type: "string"
+        x-exportParamName: "Severity"
+        x-optionalDataType: "String"
+      - name: "id"
+        in: "query"
+        required: false
+        type: "integer"
+        format: "uint64"
+        x-go-name: "ID"
+        x-exportParamName: "Id"
+        x-optionalDataType: "Int32"
+      - name: "repo"
+        in: "query"
+        required: false
+        type: "string"
+        x-go-name: "Repository"
+        x-exportParamName: "Repo"
+        x-optionalDataType: "String"
+      - name: "sha"
+        in: "query"
+        required: false
+        type: "string"
+        x-go-name: "Sha"
+        x-exportParamName: "Sha"
+        x-optionalDataType: "String"
+      responses:
+        "200":
+          description: "Vulnerability"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Vulnerability"
+        default:
+          description: "ErrorMessage"
+          schema:
+            $ref: "#/definitions/ErrorMessage"
+  /vulnerabilities:
+    get:
+      tags:
+      - "vulnerabilities"
+      summary: "Search for vulnerabilities by CVE id."
+      operationId: "GetVulnerabilities"
+      parameters:
+      - name: "Severity"
+        in: "query"
+        description: "Case insensitive vulnerabilities severity filter. Possible values\
+          \ are: low, medium, high, critical, unknown."
+        required: false
+        type: "string"
+        x-exportParamName: "Severity"
+        x-optionalDataType: "String"
+      - name: "CVEID"
+        in: "query"
+        required: true
+        type: "string"
+        x-exportParamName: "CVEID"
+      responses:
+        "200":
+          description: "Vulnerability"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Vulnerability"
+        default:
+          description: "ErrorMessage"
+          schema:
+            $ref: "#/definitions/ErrorMessage"
+  /vulnerabilities/{CVEID}/images:
+    get:
+      tags:
+      - "images"
+      summary: "List the images that contain the given vulnerability."
+      operationId: "GetVulnerabilityImages"
+      parameters:
+      - name: "CVEID"
+        in: "path"
+        required: true
+        type: "string"
+        x-exportParamName: "CVEID"
+      responses:
+        "200":
+          description: "Image"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Image"
+        default:
+          description: "ErrorMessage"
+          schema:
+            $ref: "#/definitions/ErrorMessage"
+  /vulnerabilities/{CVEID}/packages:
+    get:
+      tags:
+      - "packages"
+      summary: "List packages that contain the given CVE id."
+      operationId: "GetVulnerabilityPackages"
+      parameters:
+      - name: "CVEID"
+        in: "path"
+        required: true
+        type: "string"
+        x-exportParamName: "CVEID"
+      responses:
+        "200":
+          description: "Package"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Package"
+        default:
+          description: "ErrorMessage"
+          schema:
+            $ref: "#/definitions/ErrorMessage"
+  /vulnerabilities/{CVEID}/sources:
+    get:
+      tags:
+      - "sources"
+      summary: "List sources that contain the given vulnerability."
+      operationId: "GetVulnerabilitySources"
+      parameters:
+      - name: "CVEID"
+        in: "path"
+        required: true
+        type: "string"
+        x-exportParamName: "CVEID"
+      responses:
+        "200":
+          description: "Source"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Source"
+        default:
+          description: "ErrorMessage"
+          schema:
+            $ref: "#/definitions/ErrorMessage"
+definitions:
+  DeletedAt:
+    $ref: "#/definitions/NullTime"
+  ErrorMessage:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+        example: "something went wrong"
+        description: "in: body"
+        x-go-name: "Message"
+    description: "ErrorMessage wraps an error message in a struct so responses are\
+      \ properly\nmarshalled as a JSON object."
+    x-go-package: "metastore/pkg/handlers"
+  Image:
+    type: "object"
+    required:
+    - "Digest"
+    - "Name"
+    - "Registry"
+    properties:
+      Digest:
+        type: "string"
+        example: "9n38274ods897fmay487gsdyfga678wr82"
+      ID:
+        type: "integer"
+        format: "uint64"
+      Name:
+        type: "string"
+        example: "myorg/application"
+      Packages:
+        type: "array"
+        items:
+          $ref: "#/definitions/Package"
+      Registry:
+        type: "string"
+        example: "docker.io"
+      Sources:
+        type: "array"
+        items:
+          $ref: "#/definitions/Source"
+    title: "Image represents an OCI image."
+    example:
+      Digest: "9n38274ods897fmay487gsdyfga678wr82"
+      Packages:
+      - Homepage: "Homepage"
+        PackageManager: "PackageManager"
+        Version: "Version"
+        Images:
+        - null
+        - null
+        ID: 6
+        Vulnerabilities:
+        - Description: "Description"
+          CVEID: "CVE-7467-2020"
+          Packages:
+          - null
+          - null
+          References: ""
+          CNA: "CNA"
+          ID: 5
+          URL: "URL"
+          Ratings:
+          - MethodType:
+              CreatedAt: "2000-01-23T04:56:07.000+00:00"
+              Rating:
+              - null
+              - null
+              ID: 2
+              DeletedAt: ""
+              UpdatedAt: "2000-01-23T04:56:07.000+00:00"
+              Name: "Name"
+            Score: 9.301444243932575517419536481611430644989013671875
+            MethodTypeID: 7
+            Severity: "Severity"
+            ID: 5
+            Vector: "Vector"
+          - MethodType:
+              CreatedAt: "2000-01-23T04:56:07.000+00:00"
+              Rating:
+              - null
+              - null
+              ID: 2
+              DeletedAt: ""
+              UpdatedAt: "2000-01-23T04:56:07.000+00:00"
+              Name: "Name"
+            Score: 9.301444243932575517419536481611430644989013671875
+            MethodTypeID: 7
+            Severity: "Severity"
+            ID: 5
+            Vector: "Vector"
+        - Description: "Description"
+          CVEID: "CVE-7467-2020"
+          Packages:
+          - null
+          - null
+          References: ""
+          CNA: "CNA"
+          ID: 5
+          URL: "URL"
+          Ratings:
+          - MethodType:
+              CreatedAt: "2000-01-23T04:56:07.000+00:00"
+              Rating:
+              - null
+              - null
+              ID: 2
+              DeletedAt: ""
+              UpdatedAt: "2000-01-23T04:56:07.000+00:00"
+              Name: "Name"
+            Score: 9.301444243932575517419536481611430644989013671875
+            MethodTypeID: 7
+            Severity: "Severity"
+            ID: 5
+            Vector: "Vector"
+          - MethodType:
+              CreatedAt: "2000-01-23T04:56:07.000+00:00"
+              Rating:
+              - null
+              - null
+              ID: 2
+              DeletedAt: ""
+              UpdatedAt: "2000-01-23T04:56:07.000+00:00"
+              Name: "Name"
+            Score: 9.301444243932575517419536481611430644989013671875
+            MethodTypeID: 7
+            Severity: "Severity"
+            ID: 5
+            Vector: "Vector"
+        Sources:
+        - Repository: "myproject"
+          Organization: "vmware"
+          Packages:
+          - null
+          - null
+          Images:
+          - null
+          - null
+          Host: "gitlab.com"
+          ID: 1
+          DeletedAt: ""
+          Sha: "0eb5fcd1"
+        - Repository: "myproject"
+          Organization: "vmware"
+          Packages:
+          - null
+          - null
+          Images:
+          - null
+          - null
+          Host: "gitlab.com"
+          ID: 1
+          DeletedAt: ""
+          Sha: "0eb5fcd1"
+        Name: "Name"
+      - Homepage: "Homepage"
+        PackageManager: "PackageManager"
+        Version: "Version"
+        Images:
+        - null
+        - null
+        ID: 6
+        Vulnerabilities:
+        - Description: "Description"
+          CVEID: "CVE-7467-2020"
+          Packages:
+          - null
+          - null
+          References: ""
+          CNA: "CNA"
+          ID: 5
+          URL: "URL"
+          Ratings:
+          - MethodType:
+              CreatedAt: "2000-01-23T04:56:07.000+00:00"
+              Rating:
+              - null
+              - null
+              ID: 2
+              DeletedAt: ""
+              UpdatedAt: "2000-01-23T04:56:07.000+00:00"
+              Name: "Name"
+            Score: 9.301444243932575517419536481611430644989013671875
+            MethodTypeID: 7
+            Severity: "Severity"
+            ID: 5
+            Vector: "Vector"
+          - MethodType:
+              CreatedAt: "2000-01-23T04:56:07.000+00:00"
+              Rating:
+              - null
+              - null
+              ID: 2
+              DeletedAt: ""
+              UpdatedAt: "2000-01-23T04:56:07.000+00:00"
+              Name: "Name"
+            Score: 9.301444243932575517419536481611430644989013671875
+            MethodTypeID: 7
+            Severity: "Severity"
+            ID: 5
+            Vector: "Vector"
+        - Description: "Description"
+          CVEID: "CVE-7467-2020"
+          Packages:
+          - null
+          - null
+          References: ""
+          CNA: "CNA"
+          ID: 5
+          URL: "URL"
+          Ratings:
+          - MethodType:
+              CreatedAt: "2000-01-23T04:56:07.000+00:00"
+              Rating:
+              - null
+              - null
+              ID: 2
+              DeletedAt: ""
+              UpdatedAt: "2000-01-23T04:56:07.000+00:00"
+              Name: "Name"
+            Score: 9.301444243932575517419536481611430644989013671875
+            MethodTypeID: 7
+            Severity: "Severity"
+            ID: 5
+            Vector: "Vector"
+          - MethodType:
+              CreatedAt: "2000-01-23T04:56:07.000+00:00"
+              Rating:
+              - null
+              - null
+              ID: 2
+              DeletedAt: ""
+              UpdatedAt: "2000-01-23T04:56:07.000+00:00"
+              Name: "Name"
+            Score: 9.301444243932575517419536481611430644989013671875
+            MethodTypeID: 7
+            Severity: "Severity"
+            ID: 5
+            Vector: "Vector"
+        Sources:
+        - Repository: "myproject"
+          Organization: "vmware"
+          Packages:
+          - null
+          - null
+          Images:
+          - null
+          - null
+          Host: "gitlab.com"
+          ID: 1
+          DeletedAt: ""
+          Sha: "0eb5fcd1"
+        - Repository: "myproject"
+          Organization: "vmware"
+          Packages:
+          - null
+          - null
+          Images:
+          - null
+          - null
+          Host: "gitlab.com"
+          ID: 1
+          DeletedAt: ""
+          Sha: "0eb5fcd1"
+        Name: "Name"
+      ID: 0
+      Registry: "docker.io"
+      Sources:
+      - Repository: "myproject"
+        Organization: "vmware"
+        Packages:
+        - null
+        - null
+        Images:
+        - null
+        - null
+        Host: "gitlab.com"
+        ID: 1
+        DeletedAt: ""
+        Sha: "0eb5fcd1"
+      - Repository: "myproject"
+        Organization: "vmware"
+        Packages:
+        - null
+        - null
+        Images:
+        - null
+        - null
+        Host: "gitlab.com"
+        ID: 1
+        DeletedAt: ""
+        Sha: "0eb5fcd1"
+      Name: "myorg/application"
+    x-go-package: "metastore/pkg/models"
+  MethodType:
+    type: "object"
+    properties:
+      CreatedAt:
+        type: "string"
+        format: "date-time"
+      DeletedAt:
+        $ref: "#/definitions/DeletedAt"
+      ID:
+        type: "integer"
+        format: "uint64"
+      Name:
+        type: "string"
+      Rating:
+        type: "array"
+        items:
+          $ref: "#/definitions/Rating"
+      UpdatedAt:
+        type: "string"
+        format: "date-time"
+    example:
+      CreatedAt: "2000-01-23T04:56:07.000+00:00"
+      Rating:
+      - null
+      - null
+      ID: 2
+      DeletedAt: ""
+      UpdatedAt: "2000-01-23T04:56:07.000+00:00"
+      Name: "Name"
+    x-go-package: "metastore/pkg/models"
+  Model:
+    type: "object"
+    properties:
+      CreatedAt:
+        type: "string"
+        format: "date-time"
+      DeletedAt:
+        $ref: "#/definitions/DeletedAt"
+      ID:
+        type: "integer"
+        format: "uint64"
+      UpdatedAt:
+        type: "string"
+        format: "date-time"
+    description: "Model a basic GoLang struct which includes the following fields:\
+      \ ID, CreatedAt, UpdatedAt, DeletedAt\nIt may be embedded into your model or\
+      \ you may build your own model without it\ntype User struct {\ngorm.Model\n}"
+    x-go-package: "gorm.io/gorm"
+  NullTime:
+    type: "object"
+    properties:
+      Time:
+        type: "string"
+        format: "date-time"
+      Valid:
+        type: "boolean"
+    title: "NullTime represents a time.Time that may be null."
+    description: "NullTime implements the Scanner interface so\nit can be used as\
+      \ a scan destination, similar to NullString."
+    x-go-package: "database/sql"
+  Package:
+    type: "object"
+    properties:
+      Homepage:
+        type: "string"
+      ID:
+        type: "integer"
+        format: "uint64"
+      Images:
+        type: "array"
+        items:
+          $ref: "#/definitions/Image"
+      Name:
+        type: "string"
+      PackageManager:
+        type: "string"
+      Sources:
+        type: "array"
+        items:
+          $ref: "#/definitions/Source"
+      Version:
+        type: "string"
+      Vulnerabilities:
+        type: "array"
+        items:
+          $ref: "#/definitions/Vulnerability"
+    example:
+      Homepage: "Homepage"
+      PackageManager: "PackageManager"
+      Version: "Version"
+      Images:
+      - null
+      - null
+      ID: 6
+      Vulnerabilities:
+      - Description: "Description"
+        CVEID: "CVE-7467-2020"
+        Packages:
+        - null
+        - null
+        References: ""
+        CNA: "CNA"
+        ID: 5
+        URL: "URL"
+        Ratings:
+        - MethodType:
+            CreatedAt: "2000-01-23T04:56:07.000+00:00"
+            Rating:
+            - null
+            - null
+            ID: 2
+            DeletedAt: ""
+            UpdatedAt: "2000-01-23T04:56:07.000+00:00"
+            Name: "Name"
+          Score: 9.301444243932575517419536481611430644989013671875
+          MethodTypeID: 7
+          Severity: "Severity"
+          ID: 5
+          Vector: "Vector"
+        - MethodType:
+            CreatedAt: "2000-01-23T04:56:07.000+00:00"
+            Rating:
+            - null
+            - null
+            ID: 2
+            DeletedAt: ""
+            UpdatedAt: "2000-01-23T04:56:07.000+00:00"
+            Name: "Name"
+          Score: 9.301444243932575517419536481611430644989013671875
+          MethodTypeID: 7
+          Severity: "Severity"
+          ID: 5
+          Vector: "Vector"
+      - Description: "Description"
+        CVEID: "CVE-7467-2020"
+        Packages:
+        - null
+        - null
+        References: ""
+        CNA: "CNA"
+        ID: 5
+        URL: "URL"
+        Ratings:
+        - MethodType:
+            CreatedAt: "2000-01-23T04:56:07.000+00:00"
+            Rating:
+            - null
+            - null
+            ID: 2
+            DeletedAt: ""
+            UpdatedAt: "2000-01-23T04:56:07.000+00:00"
+            Name: "Name"
+          Score: 9.301444243932575517419536481611430644989013671875
+          MethodTypeID: 7
+          Severity: "Severity"
+          ID: 5
+          Vector: "Vector"
+        - MethodType:
+            CreatedAt: "2000-01-23T04:56:07.000+00:00"
+            Rating:
+            - null
+            - null
+            ID: 2
+            DeletedAt: ""
+            UpdatedAt: "2000-01-23T04:56:07.000+00:00"
+            Name: "Name"
+          Score: 9.301444243932575517419536481611430644989013671875
+          MethodTypeID: 7
+          Severity: "Severity"
+          ID: 5
+          Vector: "Vector"
+      Sources:
+      - Repository: "myproject"
+        Organization: "vmware"
+        Packages:
+        - null
+        - null
+        Images:
+        - null
+        - null
+        Host: "gitlab.com"
+        ID: 1
+        DeletedAt: ""
+        Sha: "0eb5fcd1"
+      - Repository: "myproject"
+        Organization: "vmware"
+        Packages:
+        - null
+        - null
+        Images:
+        - null
+        - null
+        Host: "gitlab.com"
+        ID: 1
+        DeletedAt: ""
+        Sha: "0eb5fcd1"
+      Name: "Name"
+    x-go-package: "metastore/pkg/models"
+  Rating:
+    type: "object"
+    properties:
+      ID:
+        type: "integer"
+        format: "uint64"
+      MethodType:
+        $ref: "#/definitions/MethodType"
+      MethodTypeID:
+        type: "integer"
+        format: "uint64"
+      Score:
+        type: "number"
+        format: "double"
+      Severity:
+        type: "string"
+      Vector:
+        type: "string"
+    example:
+      MethodType:
+        CreatedAt: "2000-01-23T04:56:07.000+00:00"
+        Rating:
+        - null
+        - null
+        ID: 2
+        DeletedAt: ""
+        UpdatedAt: "2000-01-23T04:56:07.000+00:00"
+        Name: "Name"
+      Score: 9.301444243932575517419536481611430644989013671875
+      MethodTypeID: 7
+      Severity: "Severity"
+      ID: 5
+      Vector: "Vector"
+    x-go-package: "metastore/pkg/models"
+  Source:
+    type: "object"
+    required:
+    - "Repository"
+    - "Sha"
+    properties:
+      DeletedAt:
+        $ref: "#/definitions/DeletedAt"
+      Host:
+        type: "string"
+        example: "gitlab.com"
+      ID:
+        type: "integer"
+        format: "uint64"
+      Images:
+        type: "array"
+        items:
+          $ref: "#/definitions/Image"
+      Organization:
+        type: "string"
+        example: "vmware"
+      Packages:
+        type: "array"
+        items:
+          $ref: "#/definitions/Package"
+      Repository:
+        type: "string"
+        example: "myproject"
+      Sha:
+        type: "string"
+        example: "0eb5fcd1"
+    example:
+      Repository: "myproject"
+      Organization: "vmware"
+      Packages:
+      - null
+      - null
+      Images:
+      - null
+      - null
+      Host: "gitlab.com"
+      ID: 1
+      DeletedAt: ""
+      Sha: "0eb5fcd1"
+    x-go-package: "metastore/pkg/models"
+  StringArray:
+    title: "StringArray represents a one-dimensional array of the PostgreSQL character\
+      \ types."
+    type: "array"
+    items:
+      type: "string"
+    x-go-package: "github.com/lib/pq"
+  Vulnerability:
+    type: "object"
+    required:
+    - "CVEID"
+    properties:
+      CNA:
+        type: "string"
+      CVEID:
+        type: "string"
+        example: "CVE-7467-2020"
+      Description:
+        type: "string"
+      ID:
+        type: "integer"
+        format: "uint64"
+      Packages:
+        type: "array"
+        items:
+          $ref: "#/definitions/Package"
+      Ratings:
+        type: "array"
+        items:
+          $ref: "#/definitions/Rating"
+      References:
+        $ref: "#/definitions/StringArray"
+      URL:
+        type: "string"
+    example:
+      Description: "Description"
+      CVEID: "CVE-7467-2020"
+      Packages:
+      - null
+      - null
+      References: ""
+      CNA: "CNA"
+      ID: 5
+      URL: "URL"
+      Ratings:
+      - MethodType:
+          CreatedAt: "2000-01-23T04:56:07.000+00:00"
+          Rating:
+          - null
+          - null
+          ID: 2
+          DeletedAt: ""
+          UpdatedAt: "2000-01-23T04:56:07.000+00:00"
+          Name: "Name"
+        Score: 9.301444243932575517419536481611430644989013671875
+        MethodTypeID: 7
+        Severity: "Severity"
+        ID: 5
+        Vector: "Vector"
+      - MethodType:
+          CreatedAt: "2000-01-23T04:56:07.000+00:00"
+          Rating:
+          - null
+          - null
+          ID: 2
+          DeletedAt: ""
+          UpdatedAt: "2000-01-23T04:56:07.000+00:00"
+          Name: "Name"
+        Score: 9.301444243932575517419536481611430644989013671875
+        MethodTypeID: 7
+        Severity: "Severity"
+        ID: 5
+        Vector: "Vector"
+    x-go-package: "metastore/pkg/models"
